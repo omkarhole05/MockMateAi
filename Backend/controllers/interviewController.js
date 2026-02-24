@@ -5,7 +5,7 @@ const {
   generateFinalReport
 } = require("../services/aiService");
 
-const MAX_QUESTIONS = 10;
+const MAX_QUESTIONS = 15;
 
 // START INTERVIEW
 exports.startInterview = async (req, res) => {

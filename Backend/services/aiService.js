@@ -41,7 +41,7 @@ Do not give answer.
       messages: [
         {
           role: "system",
-          content: "You are a strict interviewer."
+          content: "start the interview by asking for introduction first as You are a interviewer."
         },
         {
           role: "user",
