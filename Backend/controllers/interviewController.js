@@ -7,7 +7,7 @@ const {
 
 const MAX_QUESTIONS = 15;
 
-// START INTERVIEW
+// ================= START INTERVIEW =================
 exports.startInterview = async (req, res) => {
   try {
     const { skills, difficulty, type } = req.body;
@@ -18,12 +18,8 @@ exports.startInterview = async (req, res) => {
 
     const interviewId = uuidv4();
 
-    const firstQuestion = await generateQuestion(
-      skills,
-      difficulty,
-      type,
-      []
-    );
+    // ✅ Manually set first question
+    const firstQuestion = "Please introduce yourself.";
 
     const interview = new Interview({
       interviewId,
@@ -48,7 +44,8 @@ exports.startInterview = async (req, res) => {
   }
 };
 
-// SUBMIT ANSWER (NO EVALUATION HERE)
+
+// ================= SUBMIT ANSWER =================
 exports.submitAnswer = async (req, res) => {
   try {
     const { interviewId, answer } = req.body;
@@ -63,7 +60,7 @@ exports.submitAnswer = async (req, res) => {
     // Save answer
     lastEntry.answer = answer;
 
-    // If max questions reached → stop asking new
+    // If max questions reached
     if (interview.history.length >= MAX_QUESTIONS) {
       interview.status = "completed";
       await interview.save();
@@ -73,7 +70,7 @@ exports.submitAnswer = async (req, res) => {
       });
     }
 
-    // Generate next question
+    // ✅ Generate next question (intro already completed)
     const nextQuestion = await generateQuestion(
       interview.skills,
       interview.difficulty,
@@ -88,9 +85,7 @@ exports.submitAnswer = async (req, res) => {
 
     await interview.save();
 
-    res.json({
-      nextQuestion
-    });
+    res.json({ nextQuestion });
 
   } catch (error) {
     console.log(error);
@@ -99,7 +94,7 @@ exports.submitAnswer = async (req, res) => {
 };
 
 
-// FINISH INTERVIEW (ALL FEEDBACK HERE)
+// ================= FINISH INTERVIEW =================
 exports.finishInterview = async (req, res) => {
   try {
     const { interviewId } = req.body;
@@ -120,40 +115,4 @@ exports.finishInterview = async (req, res) => {
     console.log(error);
     res.status(500).json({ message: "Error finishing interview" });
   }
-};
-
-//akfjhabkfhkahfuh skip
-exports.answerQuestion = async (req, res) => {
-  const { interviewId, answer } = req.body;
-
-  const interview = await Interview.findById(interviewId);
-
-  if (!interview) {
-    return res.status(404).json({ message: "Interview not found" });
-  }
-
-  // Increase total questions
-  interview.totalQuestions += 1;
-
-  if (answer === "__SKIPPED__") {
-    interview.skippedCount += 1;
-  } else {
-    interview.history.push({
-      question: interview.currentQuestion,
-      answer
-    });
-  }
-
-  const nextQuestion = await generateQuestion(
-    interview.skills,
-    interview.difficulty,
-    interview.type,
-    interview.history
-  );
-
-  interview.currentQuestion = nextQuestion;
-
-  await interview.save();
-
-  res.json({ nextQuestion });
 };

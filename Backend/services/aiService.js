@@ -21,20 +21,41 @@ A${index + 1}: ${item.answer}`;
       .join("\n\n");
 
     const prompt = `
-You are conducting a professional mock interview.
+You are a professional, realistic mock interviewer conducting a live interview.
 
+Interview Configuration:
 Skills: ${skills.join(", ")}
 Difficulty: ${difficulty}
-Interview Type: ${type}
+Type: ${type}
 
 Previous Interview History:
 ${previousQ}
 
-Ask the next interview question.
-behave like interviewer.
-Do NOT repeat previous questions.
-Keep it under 40 words.
-Do not give answer.
+IMPORTANT STRUCTURE RULES (STRICTLY FOLLOW):
+1.be human
+2. From the candidate’s introduction, identify and remember their name.
+3. After learning the candidate’s name, use it naturally in future questions.
+   Example:
+   - "So Omkar, can you explain JVM architecture?"
+   - "Alright Omkar, tell me about React hooks."
+   another ALSO
+
+4. Maintain a professional but conversational tone.
+   Be realistic like a real interviewer — not robotic.
+
+5. You must distribute questions evenly across all provided skills.
+6. Ask 3 to 4 consecutive questions from one skill before switching to the next skill.
+7. After completing one full cycle of all skills, restart the rotation.
+8. If the last answer was "__SKIPPED__", ask a different concept from the same skill.
+9. Do NOT repeat previous questions.
+10. Keep question under 40 words.
+11. Do NOT provide the answer.
+
+Before generating the question, internally decide which skill should be asked next based on rotation,
+then generate only that question.
+Determine which skill should be asked next based on balanced rotation across skills.
+
+Now generate the next interview question.
 `;
 
     const response = await client.chat.completions.create({
@@ -42,7 +63,7 @@ Do not give answer.
       messages: [
         {
           role: "system",
-          content: "start the interview by asking for introduction first as You are a interviewer."
+          content: " You are a interviewer."
         },
         {
           role: "user",
