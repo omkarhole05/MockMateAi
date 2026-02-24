@@ -31,6 +31,7 @@ Previous Interview History:
 ${previousQ}
 
 Ask the next interview question.
+behave like interviewer.
 Do NOT repeat previous questions.
 Keep it under 40 words.
 Do not give answer.
