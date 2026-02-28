@@ -301,14 +301,21 @@ function InterviewPage({ interviewData, setInterviewData }) {
                 ref={textareaRef}
                 value={answer}
                 onChange={(e) => setAnswer(e.target.value)}
-                placeholder="Speak or type your answer..."
-                className="w-full border rounded-xl p-4 mb-6 resize-none overflow-hidden min-h-[120px] transition-all duration-200 focus:ring-2 focus:ring-indigo-500"
+                placeholder="Speak or type your answer here . . . . ."
+                className="w-full border rounded-xl p-4 mb-6 resize-none overflow-hidden min-h-[200px] transition-all duration-200 focus:ring-2 focus:ring-indigo-500"
               />
 
               <div className="flex flex-col sm:flex-row sm:justify-between gap-4">
-                
+                <button
+                  onClick={getFeedback}
+                  className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 transition-all duration-200 text-white px-6 py-2 rounded-xl"
+                >
+                  <BarChart3 size={16} />
+                  Get Feedback
+                </button>
 
                 <div className="flex flex-row sm:flex-row gap-4">
+                  
                   <button
                     onClick={skipQuestion}
                     className="flex items-center w-full justify-center gap-2 bg-yellow-500 hover:bg-yellow-600 transition-all duration-200 text-white px-6 py-2 rounded-xl"
@@ -327,13 +334,7 @@ function InterviewPage({ interviewData, setInterviewData }) {
 
                   
                 </div>
-                <button
-                  onClick={getFeedback}
-                  className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 transition-all duration-200 text-white px-6 py-2 rounded-xl"
-                >
-                  <BarChart3 size={16} />
-                  Get Feedback
-                </button>
+                
               </div>
             </>
           ) : (
