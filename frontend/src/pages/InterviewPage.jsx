@@ -5,7 +5,10 @@ import {
   SkipForward,
   Send,
   BarChart3,
-  LogOut
+  LogOut,
+  Clock,
+  Clock10Icon,
+  Clock4
 } from "lucide-react";
 import API from "../services/api";
 
@@ -24,11 +27,34 @@ function InterviewPage({ interviewData, setInterviewData }) {
   const [isRecording, setIsRecording] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
 
+  // ✅ NEW STATES
+  const [recordingTime, setRecordingTime] = useState(0);
+  const [interviewTime, setInterviewTime] = useState(0);
+
   const recognitionRef = useRef(null);
   const textareaRef = useRef(null);
+  const recordingIntervalRef = useRef(null);
+  const interviewIntervalRef = useRef(null);
 
   // =============================
-  // AUTO RESIZE TEXTAREA
+  // TOTAL INTERVIEW TIMER
+  // =============================
+  useEffect(() => {
+    interviewIntervalRef.current = setInterval(() => {
+      setInterviewTime((prev) => prev + 1);
+    }, 1000);
+
+    return () => clearInterval(interviewIntervalRef.current);
+  }, []);
+
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs < 10 ? "0" : ""}${secs}`;
+  };
+
+  // =============================
+  // AUTO RESIZE TEXTAREA (IMPROVED)
   // =============================
   useEffect(() => {
     if (textareaRef.current) {
@@ -51,7 +77,7 @@ function InterviewPage({ interviewData, setInterviewData }) {
   }, [currentQuestion]);
 
   // =============================
-  // INIT SPEECH RECOGNITION
+  // INIT SPEECH RECOGNITION (FIXED TRANSCRIPT ISSUE)
   // =============================
   useEffect(() => {
     const SpeechRecognition =
@@ -65,29 +91,55 @@ function InterviewPage({ interviewData, setInterviewData }) {
     recognition.lang = "en-US";
 
     recognition.onresult = (event) => {
-      let transcript = "";
-      for (let i = 0; i < event.results.length; i++) {
-        transcript += event.results[i][0].transcript;
+      let finalTranscript = "";
+      let interimTranscript = "";
+
+      for (let i = event.resultIndex; i < event.results.length; ++i) {
+        const transcript = event.results[i][0].transcript;
+        if (event.results[i].isFinal) {
+          finalTranscript += transcript + " ";
+        } else {
+          interimTranscript += transcript;
+        }
       }
-      setAnswer(transcript);
+
+      setAnswer((prev) => prev + finalTranscript + interimTranscript);
     };
 
-    recognition.onend = () => setIsRecording(false);
-    recognition.onerror = () => setIsRecording(false);
+    recognition.onend = () => {
+      setIsRecording(false);
+      clearInterval(recordingIntervalRef.current);
+    };
+
+    recognition.onerror = () => {
+      setIsRecording(false);
+      clearInterval(recordingIntervalRef.current);
+    };
 
     recognitionRef.current = recognition;
   }, []);
 
+  // =============================
+  // RECORDING TIMER START/STOP
+  // =============================
   const startRecording = () => {
     if (!recognitionRef.current) return;
+
     recognitionRef.current.start();
     setIsRecording(true);
+    setRecordingTime(0);
+
+    recordingIntervalRef.current = setInterval(() => {
+      setRecordingTime((prev) => prev + 1);
+    }, 1000);
   };
 
   const stopRecording = () => {
     if (!recognitionRef.current) return;
+
     recognitionRef.current.stop();
     setIsRecording(false);
+    clearInterval(recordingIntervalRef.current);
   };
 
   // =============================
@@ -171,6 +223,7 @@ function InterviewPage({ interviewData, setInterviewData }) {
       const res = await API.post("/finish", { interviewId });
       setFinalReport(res.data.finalReport);
       setIsFinished(true);
+      clearInterval(interviewIntervalRef.current);
     } catch (err) {
       console.error(err);
     } finally {
@@ -180,6 +233,7 @@ function InterviewPage({ interviewData, setInterviewData }) {
 
   const endSession = () => {
     if (isRecording) stopRecording();
+    clearInterval(interviewIntervalRef.current);
     setInterviewData(null);
   };
 
@@ -188,13 +242,19 @@ function InterviewPage({ interviewData, setInterviewData }) {
 
       {/* Navbar */}
       <div className="flex justify-between items-center px-8 py-5 bg-black/40 backdrop-blur-md border-b border-white/10">
-        <h1 className="text-white text-3xl font-semibold">
-          MockMate AI
-        </h1>
+        <div className="text-3xl text-white  font-bold tracking-wide">
+          MockMate <span className="text-indigo-400">AI</span>
+        </div>
 
         <div className="flex gap-6 text-white text-sm items-center">
           <div>Total: {totalQuestions}</div>
           <div>Skipped: {skippedCount}</div>
+
+          {/* ✅ Interview Timer */}
+          <div className="flex items-center  gap-2 bg-indigo-600 px-4 py-2 rounded-xl">
+            <Clock size={18} />
+            {formatTime(interviewTime)}
+          </div>
 
           <button
             onClick={endSession}
@@ -222,7 +282,6 @@ function InterviewPage({ interviewData, setInterviewData }) {
                 {currentQuestion}
               </p>
 
-              {/* Typing Indicator */}
               {isTyping && (
                 <div className="flex items-center gap-2 mb-4">
                   <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce"></div>
@@ -234,7 +293,7 @@ function InterviewPage({ interviewData, setInterviewData }) {
                 </div>
               )}
 
-              {/* Voice Controls (Restored Clean Version) */}
+              {/* Voice Controls */}
               <div className="mb-4">
                 {!isRecording ? (
                   <button
@@ -247,7 +306,7 @@ function InterviewPage({ interviewData, setInterviewData }) {
                 ) : (
                   <div className="flex items-center gap-4">
                     <span className="text-red-500 font-semibold animate-pulse">
-                      Listening...
+                      Listening... ({formatTime(recordingTime)})
                     </span>
 
                     <button
@@ -266,7 +325,7 @@ function InterviewPage({ interviewData, setInterviewData }) {
                 value={answer}
                 onChange={(e) => setAnswer(e.target.value)}
                 placeholder="Speak or type your answer..."
-                className="w-full border rounded-xl p-4 mb-6 resize-none overflow-hidden transition-all duration-200 focus:ring-2 focus:ring-indigo-500"
+                className="w-full border rounded-xl p-4 mb-6 resize-none overflow-hidden min-h-[120px] transition-all duration-200 focus:ring-2 focus:ring-indigo-500"
               />
 
               <div className="flex justify-between">
@@ -310,18 +369,6 @@ function InterviewPage({ interviewData, setInterviewData }) {
           )}
         </div>
       </div>
-
-      <style>
-        {`
-          @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-          }
-          .animate-fadeIn {
-            animation: fadeIn 0.4s ease-out;
-          }
-        `}
-      </style>
     </div>
   );
 }

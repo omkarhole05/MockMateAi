@@ -46,7 +46,7 @@ IMPORTANT STRUCTURE RULES (STRICTLY FOLLOW):
 5. You must distribute questions evenly across all provided skills.
 6. Ask 3 to 4 consecutive questions from one skill before switching to the next skill.
 7. After completing one full cycle of all skills, restart the rotation.
-8. If the last answer was "__SKIPPED__", ask a different concept from the same skill.
+8. If the last answer was "__SKIPPED__", ask a different simple and easy concept from the selected skill.
 9. Do NOT repeat previous questions.
 10. Keep question under 40 words.
 11. Do NOT provide the answer.
@@ -98,25 +98,59 @@ Answer ${index + 1}: ${item.answer}`;
       .join("\n\n");
 
     const prompt = `
-You are evaluating a mock interview.
+You are a senior technical interview panel evaluating a candidate.
 
+INTERVIEW SUMMARY:
 Total Questions: ${totalQuestions}
 Skipped Questions: ${skippedCount}
 
-Here is the full interview:
-
+Full Interview Transcript:
 ${formattedHistory}
 
-Provide:
+EVALUATION INSTRUCTIONS (STRICT):
 
-1. Overall Score (out of 10)
-2. Strengths (mention the concepts that user is best) in one line only
-3. English (tell about english of answer on the basis of grammer and tone of answer) in one line only
-4. Areas to Improve (mention the concepts that user has to improve) in one line only
-5. Final Advice
-but Give everything in one line only.
+1. Score each selected skill individually out of 10.
+   - Consider technical accuracy, depth of explanation, clarity, and confidence.
+   - Deduct marks for skipped answers.
+   - Deduct marks for incorrect or vague explanations.
+   - Reward structured, detailed, and correct explanations.
 
-Be structured and professional.
+2. Provide an Overall Score out of 10 based on:
+   - Technical knowledge (50%)
+   - Depth & clarity (20%)
+   - Communication quality (15%)
+   - Time efficiency & consistency (15%)
+
+3. Strengths:
+   - Mention specific concepts or topics the candidate demonstrated strong understanding in.
+   - Keep it concise (one line).
+
+4. English & Communication:
+   - Evaluate grammar, clarity, vocabulary, professionalism, and tone.
+   - Mention if answers were confident, structured, or hesitant.
+   - One line only.
+
+5. Areas to Improve:
+   - Mention exact technical concepts or areas needing improvement.
+   - One line only.
+
+6. Final Advice:
+   - Provide actionable professional advice in one line.
+
+IMPORTANT FORMAT RULES:
+- Give everything in ONE structured paragraph.
+- Clearly separate sections using labels:
+  Skill Scores:
+  Overall Score:
+  Strengths:
+  English:
+  Areas to Improve:
+  Final Advice:
+- Do not exceed 8–10 sentences total.
+- Be realistic and strict, not overly generous.
+- Do not explain your scoring logic.
+
+Generate the final evaluation.
 `;
 
     const response = await client.chat.completions.create({
