@@ -6,9 +6,7 @@ import {
   Send,
   BarChart3,
   LogOut,
-  Clock,
-  Clock10Icon,
-  Clock4
+  Clock
 } from "lucide-react";
 import API from "../services/api";
 
@@ -26,8 +24,6 @@ function InterviewPage({ interviewData, setInterviewData }) {
   const [skippedCount, setSkippedCount] = useState(0);
   const [isRecording, setIsRecording] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
-
-  // ✅ NEW STATES
   const [recordingTime, setRecordingTime] = useState(0);
   const [interviewTime, setInterviewTime] = useState(0);
 
@@ -36,9 +32,6 @@ function InterviewPage({ interviewData, setInterviewData }) {
   const recordingIntervalRef = useRef(null);
   const interviewIntervalRef = useRef(null);
 
-  // =============================
-  // TOTAL INTERVIEW TIMER
-  // =============================
   useEffect(() => {
     interviewIntervalRef.current = setInterval(() => {
       setInterviewTime((prev) => prev + 1);
@@ -53,9 +46,6 @@ function InterviewPage({ interviewData, setInterviewData }) {
     return `${mins}:${secs < 10 ? "0" : ""}${secs}`;
   };
 
-  // =============================
-  // AUTO RESIZE TEXTAREA (IMPROVED)
-  // =============================
   useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.style.height = "auto";
@@ -64,9 +54,6 @@ function InterviewPage({ interviewData, setInterviewData }) {
     }
   }, [answer]);
 
-  // =============================
-  // TEXT TO SPEECH
-  // =============================
   useEffect(() => {
     if (!currentQuestion) return;
 
@@ -76,9 +63,6 @@ function InterviewPage({ interviewData, setInterviewData }) {
     speechSynthesis.speak(utterance);
   }, [currentQuestion]);
 
-  // =============================
-  // INIT SPEECH RECOGNITION (FIXED TRANSCRIPT ISSUE)
-  // =============================
   useEffect(() => {
     const SpeechRecognition =
       window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -119,12 +103,8 @@ function InterviewPage({ interviewData, setInterviewData }) {
     recognitionRef.current = recognition;
   }, []);
 
-  // =============================
-  // RECORDING TIMER START/STOP
-  // =============================
   const startRecording = () => {
     if (!recognitionRef.current) return;
-
     recognitionRef.current.start();
     setIsRecording(true);
     setRecordingTime(0);
@@ -136,15 +116,11 @@ function InterviewPage({ interviewData, setInterviewData }) {
 
   const stopRecording = () => {
     if (!recognitionRef.current) return;
-
     recognitionRef.current.stop();
     setIsRecording(false);
     clearInterval(recordingIntervalRef.current);
   };
 
-  // =============================
-  // SUBMIT ANSWER
-  // =============================
   const submitAnswer = async () => {
     if (!answer.trim() || loading || isFinished) return;
     if (isRecording) stopRecording();
@@ -241,43 +217,44 @@ function InterviewPage({ interviewData, setInterviewData }) {
     <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 flex flex-col">
 
       {/* Navbar */}
-      <div className="flex justify-between items-center px-8 py-5 bg-black/40 backdrop-blur-md border-b border-white/10">
-        <div className="text-3xl text-white  font-bold tracking-wide">
+      <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 px-4 md:px-8 py-4 md:py-5 bg-black/40 backdrop-blur-md border-b border-white/10">
+
+        <div className="text-2xl md:text-3xl text-white font-bold tracking-wide">
           MockMate <span className="text-indigo-400">AI</span>
         </div>
 
-        <div className="flex gap-6 text-white text-sm items-center">
+        <div className="flex flex-wrap gap-3 md:gap-6 text-white text-xs md:text-sm items-center">
+
           <div>Total: {totalQuestions}</div>
           <div>Skipped: {skippedCount}</div>
 
-          {/* ✅ Interview Timer */}
-          <div className="flex items-center  gap-2 bg-indigo-600 px-4 py-2 rounded-xl">
-            <Clock size={18} />
+          <div className="flex items-center gap-2 bg-indigo-600 px-3 md:px-4 py-2 rounded-xl">
+            <Clock size={16} />
             {formatTime(interviewTime)}
           </div>
 
           <button
             onClick={endSession}
-            className="flex items-center cursor-pointer gap-2 bg-red-500 hover:bg-red-600 hover:scale-105 transition-all duration-200 px-4 py-2 rounded-xl"
+            className="flex items-center gap-2 bg-red-500 hover:bg-red-600 transition-all duration-200 px-3 md:px-4 py-2 rounded-xl"
           >
-            <LogOut size={18} />
+            <LogOut size={16} />
             End
           </button>
         </div>
       </div>
 
-      <div className="flex-1 flex justify-center items-center p-6">
-        <div className="w-full max-w-4xl bg-white rounded-3xl shadow-2xl p-8">
+      <div className="flex-1 flex justify-center items-center p-4 md:p-6">
+        <div className="w-full max-w-4xl bg-white rounded-3xl shadow-2xl p-5 md:p-8">
 
           {!isFinished ? (
             <>
-              <h2 className="text-xl font-semibold mb-4">
+              <h2 className="text-lg md:text-xl font-semibold mb-4">
                 Question {totalQuestions}
               </h2>
 
               <p
                 key={currentQuestion}
-                className="text-gray-800 text-lg mb-6 animate-fadeIn"
+                className="text-gray-800 text-base md:text-lg mb-6"
               >
                 {currentQuestion}
               </p>
@@ -298,22 +275,22 @@ function InterviewPage({ interviewData, setInterviewData }) {
                 {!isRecording ? (
                   <button
                     onClick={startRecording}
-                    className="flex cursor-pointer items-center gap-2 bg-blue-700 hover:bg-blue-800 hover:scale-105 transition-all duration-200 text-white px-4 py-2 rounded-xl"
+                    className="flex items-center gap-2 bg-blue-700 hover:bg-blue-800 transition-all duration-200 text-white px-4 py-2 rounded-xl"
                   >
-                    <Mic size={18} />
+                    <Mic size={16} />
                     Record
                   </button>
                 ) : (
-                  <div className="flex items-center gap-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
                     <span className="text-red-500 font-semibold animate-pulse">
                       Listening... ({formatTime(recordingTime)})
                     </span>
 
                     <button
                       onClick={stopRecording}
-                      className="flex cursor-pointer items-center gap-2 bg-red-500 hover:bg-red-600 hover:scale-105 transition-all duration-200 text-white px-4 py-2 rounded-xl"
+                      className="flex items-center gap-2 bg-red-500 hover:bg-red-600 transition-all duration-200 text-white px-4 py-2 rounded-xl"
                     >
-                      <Square size={18} />
+                      <Square size={16} />
                       Stop
                     </button>
                   </div>
@@ -328,41 +305,44 @@ function InterviewPage({ interviewData, setInterviewData }) {
                 className="w-full border rounded-xl p-4 mb-6 resize-none overflow-hidden min-h-[120px] transition-all duration-200 focus:ring-2 focus:ring-indigo-500"
               />
 
-              <div className="flex justify-between">
-                <button
-                  onClick={getFeedback}
-                  className="flex cursor-pointer items-center gap-2 bg-green-600 hover:bg-green-700 hover:scale-105 transition-all duration-200 text-white px-6 py-2 rounded-xl"
-                >
-                  <BarChart3 size={18} />
-                  Get Feedback
-                </button>
+              <div className="flex flex-col sm:flex-row sm:justify-between gap-4">
+                
 
-                <div className="flex gap-4">
+                <div className="flex flex-row sm:flex-row gap-4">
                   <button
                     onClick={skipQuestion}
-                    className="flex cursor-pointer items-center gap-2 bg-yellow-500 hover:bg-yellow-600 hover:scale-105 transition-all duration-200 text-white px-6 py-2 rounded-xl"
+                    className="flex items-center w-full justify-center gap-2 bg-yellow-500 hover:bg-yellow-600 transition-all duration-200 text-white px-6 py-2 rounded-xl"
                   >
-                    <SkipForward size={18} />
+                    <SkipForward size={16} />
                     Skip
                   </button>
 
                   <button
                     onClick={submitAnswer}
-                    className="flex items-center cursor-pointer gap-2 bg-indigo-600 hover:bg-indigo-700 hover:scale-105 transition-all duration-200 text-white px-6 py-2 rounded-xl"
+                    className="flex items-center w-full justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 transition-all duration-200 text-white px-6 py-2 rounded-xl"
                   >
-                    <Send size={18} />
+                    <Send size={16} />
                     Submit
                   </button>
+
+                  
                 </div>
+                <button
+                  onClick={getFeedback}
+                  className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 transition-all duration-200 text-white px-6 py-2 rounded-xl"
+                >
+                  <BarChart3 size={16} />
+                  Get Feedback
+                </button>
               </div>
             </>
           ) : (
             <>
-              <h2 className="text-2xl font-bold mb-4 text-center">
+              <h2 className="text-xl md:text-2xl font-bold mb-4 text-center">
                 Final Evaluation
               </h2>
 
-              <div className="bg-gray-100 p-6 rounded-xl whitespace-pre-wrap animate-fadeIn">
+              <div className="bg-gray-100 p-4 md:p-6 rounded-xl whitespace-pre-wrap">
                 {finalReport}
               </div>
             </>
