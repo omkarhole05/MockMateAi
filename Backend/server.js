@@ -10,8 +10,9 @@ const app = express();
 app.use(cors({
   origin: [
     "http://localhost:5173",
-    "https://mockmate-ai-brown.vercel.app/"
+    "https://mockmate-ai-brown.vercel.app"
   ],
+  methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true
 }));
 
