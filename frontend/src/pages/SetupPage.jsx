@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Code2, User2, Sparkles, Layers, Brain } from "lucide-react";
+import { Code2, User2 } from "lucide-react";
 import API from "../services/api";
 
 function SetupPage({ setInterviewData }) {
@@ -33,26 +33,26 @@ function SetupPage({ setInterviewData }) {
   };
 
   return (
-    <div className="min-h-screen w-full bg-gradient-to-br from-slate-900 to-slate-800 flex items-center justify-center px-6">
+    <div className="min-h-screen w-full bg-gradient-to-br from-slate-900 to-slate-800 flex items-center justify-center px-4 sm:px-6 py-6">
 
-      <div className="w-full max-w-7xl bg-white rounded-3xl shadow-2xl flex overflow-hidden">
+      <div className="w-full max-w-7xl bg-white rounded-3xl shadow-2xl flex flex-col md:flex-row overflow-hidden">
 
-        {/* LEFT PANEL (UNCHANGED) */}
-        <div className="w-1/2 bg-gradient-to-br from-indigo-200 to-indigo-500 text-white p-12 flex flex-col justify-center hidden md:flex">
-          <h1 className="text-5xl text-[#182337] font-bold mb-4 ">
+        {/* LEFT PANEL */}
+        <div className="md:w-1/2 bg-gradient-to-br from-indigo-200 to-indigo-500 text-white p-8 md:p-12 flex flex-col justify-center hidden md:flex">
+          <h1 className="text-4xl md:text-5xl text-[#182337] font-bold mb-4">
             MockMate AI
           </h1>
 
-          <h2 className="text-2xl font-semibold mb-6 opacity-95">
+          <h2 className="text-xl md:text-2xl font-semibold mb-6 opacity-95">
             Your Personal AI Interview Coach
           </h2>
 
-          <p className="text-lg opacity-90 leading-relaxed mb-8">
+          <p className="text-base md:text-lg opacity-90 leading-relaxed mb-8">
             Practice realistic mock interviews tailored to your skills.
             Get instant feedback. Improve faster. Land your dream job.
           </p>
 
-          <div className="space-y-4 text-sm opacity-85">
+          <div className="space-y-3 text-sm opacity-85">
             <p>- Unlimited Practice Sessions</p>
             <p>- Technical & HR Interviews</p>
             <p>- Smart AI Feedback</p>
@@ -61,9 +61,9 @@ function SetupPage({ setInterviewData }) {
         </div>
 
         {/* RIGHT PANEL */}
-        <div className="w-full md:w-1/2 p-12">
+        <div className="w-full md:w-1/2 p-6 sm:p-8 md:p-12">
 
-          <h2 className="text-3xl font-semibold mb-8 text-gray-800">
+          <h2 className="text-2xl sm:text-3xl font-semibold mb-8 text-gray-800">
             Start Your Mock Interview
           </h2>
 
@@ -90,61 +90,30 @@ function SetupPage({ setInterviewData }) {
               Difficulty Level
             </label>
 
-            <div className="flex gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
 
-              {/* Basic */}
-              <button
-                onClick={() => setDifficulty("Basic")}
-                className={`flex flex-col items-start px-4 py-3 rounded-xl cursor-pointer transition w-1/3 ${
-                  difficulty === "Basic"
-                    ? "bg-green-500 text-white shadow"
-                    : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                }`}
-              >
-                <div className="flex items-center  gap-2 font-semibold">
-                  
-                  Basic
-                </div>
-                <span className="flex items-start text-left text-xs mt-1 opacity-80">
-                  Fundamentals & core concepts
-                </span>
-              </button>
-
-              {/* Medium */}
-              <button
-                onClick={() => setDifficulty("Medium")}
-                className={`flex flex-col items-start px-4 py-3 rounded-xl transition cursor-pointer w-1/3 ${
-                  difficulty === "Medium"
-                    ? "bg-yellow-500 text-white shadow"
-                    : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                }`}
-              >
-                <div className="flex items-center gap-2 font-semibold">
-                  
-                  Medium
-                </div>
-                <span className="flex items-start text-left text-xs mt-1 opacity-80">
-                  Applied knowledge & scenarios
-                </span>
-              </button>
-
-              {/* Advanced */}
-              <button
-                onClick={() => setDifficulty("Advanced")}
-                className={`flex flex-col items-start px-4 py-3 rounded-xl transition w-1/3 cursor-pointer ${
-                  difficulty === "Advanced"
-                    ? "bg-red-500 text-white shadow"
-                    : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                }`}
-              >
-                <div className="flex items-center gap-2 font-semibold">
-                  
-                  Advanced
-                </div>
-                <span className="flex items-start text-left flex text-xs mt-1 opacity-80">
-                  System design & deep expertise
-                </span>
-              </button>
+              {["Basic", "Medium", "Advanced"].map((level) => (
+                <button
+                  key={level}
+                  onClick={() => setDifficulty(level)}
+                  className={`flex flex-col items-start px-4 py-3 rounded-xl transition w-full ${
+                    difficulty === level
+                      ? level === "Basic"
+                        ? "bg-green-500 text-white shadow"
+                        : level === "Medium"
+                        ? "bg-yellow-500 text-white shadow"
+                        : "bg-red-500 text-white shadow"
+                      : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                  }`}
+                >
+                  <div className="font-semibold">{level}</div>
+                  <span className="text-xs mt-1 opacity-80">
+                    {level === "Basic" && "Fundamentals & core concepts"}
+                    {level === "Medium" && "Applied knowledge & scenarios"}
+                    {level === "Advanced" && "System design & deep expertise"}
+                  </span>
+                </button>
+              ))}
 
             </div>
           </div>
@@ -155,12 +124,11 @@ function SetupPage({ setInterviewData }) {
               Interview Type
             </label>
 
-            <div className="flex gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
 
-              {/* Technical */}
               <button
                 onClick={() => setType("Technical")}
-                className={`flex flex-col items-start px-4 py-3 rounded-xl transition cursor-pointer w-1/2 ${
+                className={`flex flex-col items-start px-4 py-3 rounded-xl transition w-full ${
                   type === "Technical"
                     ? "bg-[#182337] text-white shadow"
                     : "bg-gray-200 text-gray-700 hover:bg-gray-300"
@@ -175,11 +143,15 @@ function SetupPage({ setInterviewData }) {
                 </span>
               </button>
 
-              {/* HR */}
               <button
-                onClick={() => setType("Generate a practical HR/Behavioral interview question that tests soft skills, decision-making, teamwork, and real-life problem handling. difficulty level- very simple and easy.")}
-                className={`flex flex-col items-start px-4 py-3 cursor-pointer rounded-xl transition w-1/2 ${
-                  type === "Generate a practical HR/Behavioral interview question that tests soft skills, decision-making, teamwork, and real-life problem handling. difficulty level- very simple and easy."
+                onClick={() =>
+                  setType(
+                    "Generate a practical HR/Behavioral interview question that tests soft skills, decision-making, teamwork, and real-life problem handling. difficulty level- very simple and easy."
+                  )
+                }
+                className={`flex flex-col items-start px-4 py-3 rounded-xl transition w-full ${
+                  type ===
+                  "Generate a practical HR/Behavioral interview question that tests soft skills, decision-making, teamwork, and real-life problem handling. difficulty level- very simple and easy."
                     ? "bg-[#182337] text-white shadow"
                     : "bg-gray-200 text-gray-700 hover:bg-gray-300"
                 }`}
@@ -200,7 +172,7 @@ function SetupPage({ setInterviewData }) {
           <button
             onClick={startInterview}
             disabled={loading}
-            className="w-full bg-[#6565ff] cursor-pointer text-white py-4 rounded-xl text-lg font-medium hover:bg-[#182337] transition disabled:opacity-50 shadow-lg"
+            className="w-full bg-[#6565ff] text-white py-4 rounded-xl text-lg font-medium hover:bg-[#182337] transition disabled:opacity-50 shadow-lg"
           >
             {loading ? "Launching Interview..." : "Start Interview"}
           </button>
